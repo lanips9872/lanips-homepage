@@ -1,2 +1,8 @@
+@import url('https://fonts.googleapis.com/css?family=Alegreya+Sans+SC:300');
+
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+
+@theme {
+  --font-alegreya: "Alegreya Sans SC", sans-serif;
+}
