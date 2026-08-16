@@ -1,17 +1,31 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import { Code } from "astro-expressive-code/components";
 ---
 
 <Layout>
-    <div class="flex flex-wrap m-20">
+    <div class="flex flex-wrap justify-center items-center m-20">
         <img 
         src="https://pbs.twimg.com/profile_images/2035213355724808192/SaHgdN6W_400x400.jpg" 
         alt="プロフィール画像" 
-        class="w-64 rounded-full" 
+        class="mx-24 w-96 rounded-full" 
         /> 
-        <div>
-            <h1 class="text-3xl font-bold">Lanips</h1>
-            <p class="text-gray-600 dark:text-gray-400">UEC26</p>
+        <div class="m-5">
+            <h1 class="text-5xl font-bold">Lanips</h1>
+            <p class="my-8 max-w-2xl text-gray-600 dark:text-gray-400 text-lg">
+                UEC26/1クラ。一人暮らしのくせに調布から離れた場所に住んでいるので、調布住みの友達たちがワイワイ遊んでるのが羨ましい。真面目で几帳面な雰囲気をまとっているかもしれないが、多分そこそこ変な人ではある。
+            </p>
+            <Code code={`
+def greet(rel = getRelationship(you))
+    if rel == "Stranger"
+        puts "初めまして"
+    elsif rel == "Acquaintance"
+        puts "お世話になってます"
+    elsif rel == "Friend"
+        puts "ｺｯﾁﾐﾝﾅ"  
+end
+            `} lang="rb" title="greet.rb"/>
+            </pre>
         </div>
     </div>
 </Layout>
