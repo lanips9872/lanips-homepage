@@ -6,22 +6,29 @@ import Layout from "@/layouts/Layout.astro";
 <Layout>
     <div class="flex flex-wrap justify-center items-center mx-5 my-10">
         <Box 
+        status="finished" 
+        title="個人サイト" 
+        description="一旦完成。だけどまだまだ書きたいことあるからじわじわ改良していきたい。"
+        href="./"
+        imgSrc="https://pbs.twimg.com/profile_images/2035213355724808192/SaHgdN6W_400x400.jpg"
+        imgAlt="lanipsの画像"
+        className="w-2/5"
+        />
+        <Box 
         status="wip" 
         title="プレステジョアンの黄金境 Remix" 
-        description="幻想的なトランス系音楽にしたい。制作中。ただ自信はないのでおおっぴらに公開する予定はないかも..." 
-        className="w-2/5"
-        />
-        <Box 
-        status="finished" 
-        title="プレステジョアンの黄金境 Remix" 
         description="幻想的なトランス系音楽にしたい。制作中。ただ自信はないのでおおっぴらに公開する予定はないかも..."
-        className="w-2/5" 
+        imgSrc="src/img/music_mark.png"
+        imgAlt="音楽マーク"
+        className="w-2/5"
         />
         <Box 
-        status="other" 
-        title="プレステジョアンの黄金境 Remix" 
-        description="幻想的なトランス系音楽にしたい。制作中。ただ自信はないのでおおっぴらに公開する予定はないかも..." 
+        status="wip" 
+        title="M3の曲" 
+        description="いい曲になってほしい。鼻歌からメロディーを抽出するマン"
+        imgSrc="src/img/music_mark.png"
+        imgAlt="音楽マーク"
         className="w-2/5"
-        />        
+        />
     </div>
 </Layout>

@@ -1,9 +1,11 @@
 ---
-// src/layouts/Layout.astro
 import BranchingBackground from '../components/BranchingBackground.astro';
 import Layout from "@/layouts/Layout.astro";
 ---
 
 <Layout>
+    <h1 class="flex justify-center font-alegreya text-8xl my-48">
+        Welcome to LanipsLab.
+    </h1>
     <BranchingBackground color="255, 135, 0" lengthDecay={0.9} treeCount={1} maxDepth={10} branchAngle={72} initialLength={180} segmentDuration={1500} />
 </Layout>
