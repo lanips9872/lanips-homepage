@@ -24,10 +24,20 @@ const {
     <meta name="description" content={description} />
   </head>
   <body class="mx-8 my-4 bg-white dark:bg-gray-950 dark:text-white">
-    <Header />
-    <main>
-      <slot />
-    </main>
-    <Footer />
+    <div class="lg:hidden flex items-center justify-center min-h-screen p-6 text-center">
+      <p class="text-gray-700">
+        このページは横幅が狭い画面での閲覧を想定していません。<br />
+        画面の横幅が1024px以上の環境でご覧ください。
+      </p>
+    </div>
+
+    <!-- 通常のコンテンツ: md以上でのみ表示 -->
+    <div class="hidden lg:block">
+      <Header />
+      <main>
+        <slot />
+      </main>
+      <Footer />
+    </div>
   </body>
 </html>
