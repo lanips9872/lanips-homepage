@@ -1,7 +1,27 @@
 ---
+import Box from "@/components/box.astro";
 import Layout from "@/layouts/Layout.astro";
 ---
 
 <Layout>
- 
+    <div class="flex flex-wrap justify-center items-center mx-5 my-10">
+        <Box 
+        status="wip" 
+        title="プレステジョアンの黄金境 Remix" 
+        description="幻想的なトランス系音楽にしたい。制作中。ただ自信はないのでおおっぴらに公開する予定はないかも..." 
+        className="w-2/5"
+        />
+        <Box 
+        status="finished" 
+        title="プレステジョアンの黄金境 Remix" 
+        description="幻想的なトランス系音楽にしたい。制作中。ただ自信はないのでおおっぴらに公開する予定はないかも..."
+        className="w-2/5" 
+        />
+        <Box 
+        status="other" 
+        title="プレステジョアンの黄金境 Remix" 
+        description="幻想的なトランス系音楽にしたい。制作中。ただ自信はないのでおおっぴらに公開する予定はないかも..." 
+        className="w-2/5"
+        />        
+    </div>
 </Layout>

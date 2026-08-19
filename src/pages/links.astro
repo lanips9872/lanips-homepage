@@ -1,7 +1,19 @@
 ---
+import { siYoutube } from "simple-icons";
 import Layout from "@/layouts/Layout.astro";
 ---
 
 <Layout>
- 
+    <div class="flex items-center border-b border-zinc-600 py-4">
+        <img src="https://pbs.twimg.com/profile_images/2059289946696093697/3BVGrYtW_400x400.jpg" alt="アイコン画像(ひな)" class="rounded-full size-32">
+        <div class="flex flex-col mx-5 w-72">
+            <h1 class="text-4xl font-bold">ひな</h1>
+            <p class="mt-5 text-lg">いろいろ熱血してる人。三食団子教祖。</p>
+        </div>
+        <a href="https://www.youtube.com/@ensemble_stars" class="text-gray-400 hover:text-red-600 transition-colors">
+            <svg role="img" viewBox="0 0 24 24" fill="currentColor" class="size-40">
+                <path d={siYoutube.path} />
+            </svg>
+        </a>
+    </div>
 </Layout>
