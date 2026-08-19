@@ -1,0 +1,403 @@
+---
+// BranchingBackground.astro
+// 中心(または任意の点)から線が伸び、一定距離進むごとに120°で二手に分岐する
+// フラクタル状の背景アニメーション。
+
+interface Props {
+    color?: string;       // 線の色 (rgba推奨。アルファはtreeOpacityと掛け合わされる)
+    lineWidth?: number;    // 根本の線の太さ(px)
+    maxDepth?: number;     // 分岐する最大の階層数
+    branchAngle?: number;  // 二手に分かれる際、親の方向から片側に何度ズレるか(60なら合計120°で開く)
+    initialLength?: number;// 最初の枝の長さ(px)
+    lengthDecay?: number;  // 分岐するたびに長さを何倍にするか (0〜1)
+    treeCount?: number;    // 同時に走らせる木の本数
+    segmentDuration?: number; // 1本の枝が伸びきるまでの時間(ms)
+    holdDuration?: number;    // 完成した木を静止表示しておく時間(ms)
+    fadeDuration?: number;    // フェードアウトにかける時間(ms)
+}
+
+const {
+    color = "148, 197, 255", // "R, G, B" 形式(CSSのrgba()に展開して使う)
+    lineWidth = 1.4,
+    maxDepth = 6,
+    branchAngle = 60,
+    initialLength = 90,
+    lengthDecay = 0.72,
+    treeCount = 3,
+    segmentDuration = 450,
+    holdDuration = 1500,
+    fadeDuration = 1200,
+} = Astro.props;
+---
+
+<canvas
+    class="branching-bg"
+    data-color={color}
+    data-line-width={lineWidth}
+    data-max-depth={maxDepth}
+    data-branch-angle={branchAngle}
+    data-initial-length={initialLength}
+    data-length-decay={lengthDecay}
+    data-tree-count={treeCount}
+    data-segment-duration={segmentDuration}
+    data-hold-duration={holdDuration}
+    data-fade-duration={fadeDuration}
+></canvas>
+
+<style>
+.branching-bg {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: -1;
+    display: block;
+}
+</style>
+
+<script>
+interface TreeOptions {
+    color: string;
+    lineWidth: number;
+    maxDepth: number;
+    branchAngle: number;
+    initialLength: number;
+    lengthDecay: number;
+    treeCount: number;
+    segmentDuration: number;
+    holdDuration: number;
+    fadeDuration: number;
+}
+
+type TreeState = "lighting" | "growing" | "holding" | "fading";
+
+class Segment {
+    x1: number;
+    y1: number;
+    angle: number;
+    length: number;
+    depth: number;
+    x2: number;
+    y2: number;
+    progress: number;
+    delay: number;
+    done: boolean;
+    spawned: boolean;
+
+    constructor(
+        x1: number,
+        y1: number,
+        angle: number,
+        length: number,
+        depth: number,
+        delay = 0
+    ) {
+        this.x1 = x1;
+        this.y1 = y1;
+        this.angle = angle;
+        this.length = length;
+        this.depth = depth;
+        this.x2 = x1 + Math.cos(angle) * length;
+        this.y2 = y1 + Math.sin(angle) * length;
+        this.progress = 0; // 0〜1
+        this.delay = delay; // このセグメントが伸び始めるまでの遅延(ms)
+        this.done = false;
+        this.spawned = false;
+    }
+
+    currentEnd(): { x: number; y: number } {
+        const p = this.progress;
+        return {
+            x: this.x1 + (this.x2 - this.x1) * p,
+            y: this.y1 + (this.y2 - this.y1) * p,
+        };
+    }
+}
+
+class Tree {
+    rootX: number = 0;
+    rootY: number = 0;
+    lightProgress: number = 0;
+    opts: TreeOptions;
+    canvasW: number;
+    canvasH: number;
+    opacity: number;
+    state: TreeState;
+    stateTimer: number;
+    segments: Segment[];
+
+    constructor(canvasW: number, canvasH: number, opts: TreeOptions) {
+        this.opts = opts;
+        this.canvasW = canvasW;
+        this.canvasH = canvasH;
+        this.opacity = 1;
+        this.state = "growing"; // growing -> holding -> fading -> (reset)
+        this.stateTimer = 0;
+        this.segments = [];
+        this.reset();
+    }
+
+    reset(): void {
+        const { initialLength } = this.opts;
+
+        const x = Math.random() * this.canvasW;
+        const y = Math.random() * this.canvasH;
+        const angle = Math.random() * Math.PI * 2;
+
+        this.rootX = x;
+        this.rootY = y;
+
+        this.segments = [
+            new Segment(
+                x,
+                y,
+                angle,
+                initialLength,
+                0
+            )
+        ];
+
+        this.state = "lighting";
+        this.stateTimer = 0;
+        this.opacity = 1;
+        this.lightProgress = 0;
+    }
+
+    update(dt: number): void {
+        const {
+            maxDepth,
+            branchAngle,
+            lengthDecay,
+            segmentDuration,
+            holdDuration,
+            fadeDuration,
+        } = this.opts;
+
+        const spread = (branchAngle * Math.PI) / 180;
+
+        // 光がじわっと出現
+        if (this.state === "lighting") {
+            this.stateTimer += dt;
+
+            this.lightProgress = Math.min(
+                this.stateTimer / 600,
+                1
+            );
+
+            if (this.lightProgress >= 1) {
+                this.state = "growing";
+                this.stateTimer = 0;
+            }
+
+            return;
+        }
+
+
+        if (this.state === "growing") {
+            let anyActive = false;
+            for (const seg of this.segments) {
+                if (seg.done) continue;
+                anyActive = true;
+                if (seg.delay > 0) {
+                    seg.delay -= dt;
+                    continue;
+                }
+                seg.progress = Math.min(1, seg.progress + dt / segmentDuration);
+                if (seg.progress >= 1 && !seg.spawned) {
+                    seg.spawned = true;
+                    seg.done = true;
+                    const nextDepth = seg.depth + 1;
+                    const nextLength = seg.length * lengthDecay;
+                    if (nextDepth <= maxDepth && nextLength > 4) {
+                    const childA = new Segment(
+                        seg.x2,
+                        seg.y2,
+                        seg.angle - spread,
+                        nextLength,
+                        nextDepth
+                    );
+                    const childB = new Segment(
+                        seg.x2,
+                        seg.y2,
+                        seg.angle + spread,
+                        nextLength,
+                        nextDepth
+                    );
+                    this.segments.push(childA, childB);
+                    }
+                }
+            }
+            if (!anyActive) {
+                this.state = "holding";
+                this.stateTimer = 0;
+            }
+        } else if (this.state === "holding") {
+            this.stateTimer += dt;
+            if (this.stateTimer >= holdDuration) {
+                this.state = "fading";
+                this.stateTimer = 0;
+            }
+        } else if (this.state === "fading") {
+            this.stateTimer += dt;
+            this.opacity = Math.max(0, 1 - this.stateTimer / fadeDuration);
+            if (this.stateTimer >= fadeDuration) {
+                this.reset();
+            }
+        }
+        }
+
+        draw(ctx: CanvasRenderingContext2D): void {
+        
+            if (this.opacity <= 0) return;
+            const { color, lineWidth, maxDepth } = this.opts;
+
+            // 光線
+            ctx.lineCap = "round";
+            for (const seg of this.segments) {
+                if (seg.delay > 0 && seg.progress === 0) continue;
+                const end = seg.done ? { x: seg.x2, y: seg.y2 } : seg.currentEnd();
+                const taper = Math.pow(0.86, seg.depth);
+                ctx.strokeStyle = `rgba(${color}, ${this.opacity * (0.9 - (seg.depth / maxDepth) * 0.5)})`;
+                ctx.lineWidth = Math.max(0.4, lineWidth * taper);
+                ctx.beginPath();
+                ctx.moveTo(seg.x1, seg.y1);
+                ctx.lineTo(end.x, end.y);
+                ctx.stroke();
+            }
+
+            // ===============================
+            // 根本の光
+            // ===============================
+
+            const x = this.rootX;
+            const y = this.rootY;
+
+            const lightOpacity =
+                this.lightProgress * this.opacity;
+
+            if (lightOpacity > 0) {
+                ctx.save();
+
+                const glow = ctx.createRadialGradient(
+                    x,
+                    y,
+                    0,
+                    x,
+                    y,
+                    40
+                );
+
+                glow.addColorStop(
+                    0,
+                    `rgba(255, 255, 255, ${0.9 * lightOpacity})`
+                );
+
+                glow.addColorStop(
+                    0.15,
+                    `rgba(255, 255, 255, ${0.4 * lightOpacity})`
+                );
+
+                glow.addColorStop(
+                    0.4,
+                    `rgba(${color}, ${0.15 * lightOpacity})`
+                );
+
+                glow.addColorStop(
+                    1,
+                    `rgba(${color}, 0)`
+                );
+
+                ctx.fillStyle = glow;
+
+                ctx.beginPath();
+                ctx.arc(x, y, 40, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 中心の小さな光
+                ctx.fillStyle =
+                    `rgba(255, 255, 255, ${lightOpacity})`;
+
+                ctx.beginPath();
+                ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+            }
+        }
+}
+
+function initBranchingBackground(canvas: HTMLCanvasElement): void {
+    const ctx2 = canvas.getContext("2d"); if (!ctx2) return; // ctx を使う内部関数にも安全に渡すために non-null な別名を作る 
+    const ctx: CanvasRenderingContext2D = ctx2;
+    if (!ctx) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    const opts: TreeOptions = {
+        color: canvas.dataset.color || "148, 197, 255",
+        lineWidth: parseFloat(canvas.dataset.lineWidth || "") || 1.4,
+        maxDepth: parseInt(canvas.dataset.maxDepth || "") || 6,
+        branchAngle: parseFloat(canvas.dataset.branchAngle || "") || 60,
+        initialLength: parseFloat(canvas.dataset.initialLength || "") || 90,
+        lengthDecay: parseFloat(canvas.dataset.lengthDecay || "") || 0.72,
+        treeCount: parseInt(canvas.dataset.treeCount || "") || 3,
+        segmentDuration: parseFloat(canvas.dataset.segmentDuration || "") || 450,
+        holdDuration: parseFloat(canvas.dataset.holdDuration || "") || 1500,
+        fadeDuration: parseFloat(canvas.dataset.fadeDuration || "") || 1200,
+    };
+
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+
+    function resize() {
+        w = window.innerWidth;
+        h = window.innerHeight;
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resize();
+    window.addEventListener("resize", resize);
+
+    const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (reduceMotion) {
+        // アニメーションなしで一本だけ完成形を静的に描画する
+        const tree = new Tree(w, h, opts);
+        // 十分な時間経過をシミュレートして即座に完成させる
+        for (let i = 0; i < 200; i++) tree.update(1000);
+        tree.opacity = 0.6;
+        tree.draw(ctx);
+        return;
+    }
+
+    const trees: Tree[] = [];
+    for (let i = 0; i < opts.treeCount; i++) {
+        const t = new Tree(w, h, opts);
+        // 開始タイミングをずらして自然な見た目にする
+        t.state = "fading";
+        t.opacity = 0;
+        t.stateTimer = opts.fadeDuration - (i * opts.fadeDuration) / opts.treeCount;
+        trees.push(t);
+    }
+
+    let last = performance.now();
+    function loop(now: number): void {
+        const dt = now - last;
+        last = now;
+        ctx.clearRect(0, 0, w, h);
+        for (const t of trees) {
+            t.update(dt);
+            t.draw(ctx);
+        }
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+}
+
+    document.querySelectorAll<HTMLCanvasElement>("canvas.branching-bg").forEach((el) => {
+        initBranchingBackground(el); 
+    });
+</script>

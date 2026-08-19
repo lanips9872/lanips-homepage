@@ -1,4 +1,6 @@
 ---
+import { siX, siGithub, siNote } from "simple-icons";
+import DiaButton from "@/components/DiaButton.astro";
 import Layout from "@/layouts/Layout.astro";
 import { Code } from "astro-expressive-code/components";
 ---
@@ -27,5 +29,10 @@ end
             `} lang="rb" title="greet.rb"/>
             </pre>
         </div>
+    </div>
+    <div class="flex justify-center w-full mb-15">
+        <DiaButton href="https://x.com/lanips9872" path={siX.path} hovcolor="hover:text-gray-200" />
+        <DiaButton href="https://github.com/lanips9872" path={siGithub.path} hovcolor="hover:text-gray-600" />
+        <DiaButton href="https://note.com/spinal9872" path={siNote.path} hovcolor="hover:text-teal-700" />
     </div>
 </Layout>

@@ -1,7 +1,9 @@
 ---
+// src/layouts/Layout.astro
+import BranchingBackground from '../components/BranchingBackground.astro';
 import Layout from "@/layouts/Layout.astro";
 ---
 
 <Layout>
- 
+    <BranchingBackground color="255, 135, 0" lengthDecay={0.9} treeCount={1} maxDepth={10} branchAngle={72} initialLength={180} segmentDuration={1500} />
 </Layout>
