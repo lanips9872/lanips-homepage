@@ -1,0 +1,17 @@
+---
+interface Props {
+    path: any;
+    hovcolor: string;
+    href: string;
+} const {
+    path = "",
+    hovcolor = "",
+    href = ""
+} = Astro.props;
+---
+
+<a href={href} class=`border p-2 m-1 rotate-45 text-gray-400 ${hovcolor} transition`>
+    <svg role="img" viewBox="0 0 24 24" fill="currentColor" class="-rotate-45 size-8">
+        <path d={path} />
+    </svg>
+</a>
