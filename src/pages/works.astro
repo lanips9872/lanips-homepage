@@ -1,6 +1,7 @@
 ---
 import Box from "@/components/Box.astro";
 import Layout from "@/layouts/Layout.astro";
+import musicMark from '@/img/music_mark.png';
 ---
 
 <Layout>
@@ -18,7 +19,7 @@ import Layout from "@/layouts/Layout.astro";
         status="wip" 
         title="プレステジョアンの黄金境 Remix" 
         description="幻想的なトランス系音楽にしたい。制作中。ただ自信はないのでおおっぴらに公開する予定はないかも..."
-        imgSrc="src/img/music_mark.png"
+        imgSrc={musicMark.src}
         imgAlt="音楽マーク"
         className="w-2/5"
         />
@@ -26,7 +27,7 @@ import Layout from "@/layouts/Layout.astro";
         status="wip" 
         title="M3の曲" 
         description="いい曲になってほしい。鼻歌からメロディーを抽出するマン"
-        imgSrc="src/img/music_mark.png"
+        imgSrc={musicMark.src}
         imgAlt="音楽マーク"
         className="w-2/5"
         />
