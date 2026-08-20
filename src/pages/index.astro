@@ -4,8 +4,19 @@ import Layout from "@/layouts/Layout.astro";
 ---
 
 <Layout>
-    <h1 class="flex justify-center font-alegreya text-8xl my-48">
+    <h1 class="flex justify-center font-alegreya text-8xl my-48 fade-in-on-load">
         Welcome to LanipsLab.
     </h1>
     <BranchingBackground color="255, 135, 0" lengthDecay={0.9} treeCount={1} maxDepth={10} branchAngle={72} initialLength={180} segmentDuration={1500} />
 </Layout>
+
+<style>
+  .fade-in-on-load {
+    animation: fade-in-only 5.0s ease-out 2s both;
+  }
+
+  @keyframes fade-in-only {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+</style>
