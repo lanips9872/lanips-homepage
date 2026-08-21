@@ -28,9 +28,10 @@ const bgcolor = {
 
 <!-- titleとdescriptionをそれぞれ任意でつけることができ、自動でそれっぽくなる -->
 
+<!-- 画面が広い(500px以上)のとき -->
 <a 
 href={href}
-class=`flex items-center my-3 mx-1.5 p-4 rounded-2xl border border-gray-500 shadow-md dark:shadow-none dark:ring-2 dark:ring-gray-600 ${bgcolor[status]} ${className}`
+class=`flex items-center my-3 mx-1.5 p-4 rounded-2xl border border-gray-500 shadow-md dark:shadow-none dark:ring-2 dark:ring-gray-600 max-[500px]:hidden ${bgcolor[status]} ${className}`
 >
     <div class="flex flex-col justify-center">
         {status === "wip" ? (
@@ -44,7 +45,30 @@ class=`flex items-center my-3 mx-1.5 p-4 rounded-2xl border border-gray-500 shad
         )}
         <img src={imgSrc} alt={imgAlt} class="mr-16 w-24 h-24">
     </div>
-    <div class="flex flex-col dark:text-zinc-200 text-gray-800">
+    <div class="flex flex-col dark:text-zinc-200 text-gray-800 ml-6">
+        <h1 class="text-2xl font-bold">{title}</h1>
+        <p class="mt-2">{description}</p>
+    </div>
+    <slot />
+</a>
+
+<!-- 画面が狭い(500px未満)とき -->
+<a 
+href={href}
+class=`flex flex-col justify-center my-3 mx-1.5 p-4 rounded-2xl border border-gray-500 shadow-md dark:shadow-none dark:ring-2 dark:ring-gray-600 min-[500px]:hidden  ${bgcolor[status]} ${className}`
+>
+    <div>
+        {status === "wip" ? (
+            <div class="w-24 mb-3 text-center text-gray-500 dark:text-zinc-200">＜制作中＞</div>
+        ) : (
+            (status === "finished" ? (
+                <div class="w-24 mb-3 text-center text-gray-500 dark:text-zinc-200">＜完成済＞</div>
+            ) : (
+            <div/>
+            ))
+        )}
+    </div>
+    <div class="flex flex-col dark:text-zinc-200 text-gray-800 ml-6">
         <h1 class="text-2xl font-bold">{title}</h1>
         <p class="mt-2">{description}</p>
     </div>

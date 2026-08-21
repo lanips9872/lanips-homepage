@@ -2,7 +2,7 @@
 
 ---
 
-<header>
+<header class="max-[660px]:hidden">
   <div class="flex flex-wrap items-center justify-between">
     <div>
       <a href="/" class="no-underline font-alegreya text-5xl font-bold">
@@ -28,3 +28,46 @@
     </nav>
   </div>
 </header>
+
+
+<header class="min-[660px]:hidden relative">
+  <div class="flex flex-wrap items-center justify-between">
+    <div>
+      <a href="/" class="no-underline font-alegreya text-5xl font-bold">
+        <h1 class="mt-4 text-orange-500">LanipsLab.</h1>
+      </a>
+    </div>
+    <button id="menu-btn">
+      <svg id="closed" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 mt-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+      </svg>
+      <svg id="opened" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 mt-4 hidden">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+  <nav id="mobile-menu" class="hidden flex-col items-end absolute right-0 top-full z-50 rounded-xl font-alegreya text-2xl bg-gray-700 p-4">
+    <a href="/" class="block my-3 text-center no-underline active:text-orange-500 active:underline active:bg-gray-800">Home</a>
+    <a href="/profile" class="block my-3 text-center no-underline active:text-orange-500 active:underline active:bg-gray-800">Profile</a>
+    <a href="/works" class="block my-3 text-center no-underline active:text-orange-500 active:underline active:bg-gray-800">Works</a>
+    <a href="/links" class="block my-3 text-center no-underline active:text-orange-500 active:underline active:bg-gray-800">Links</a>
+  </nav>
+</header>
+
+<script>
+  const btn = document.getElementById("menu-btn");
+  const menu = document.getElementById("mobile-menu");
+  const iconOpen = document.getElementById("opened");
+  const iconClose = document.getElementById("closed");
+
+  btn?.addEventListener("click", () => {
+    const isOpen = menu?.classList.toggle("hidden") === false;
+    menu?.classList.toggle("flex flex-wrap", isOpen);
+
+    iconOpen?.classList.toggle("hidden", isOpen);
+    iconClose?.classList.toggle("hidden", !isOpen);
+
+    btn.setAttribute("aria-expanded", String(isOpen));
+  });
+</script>
+
