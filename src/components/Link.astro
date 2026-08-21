@@ -12,11 +12,28 @@ interface Props {
 } = Astro.props;
 ---
 
-<div class="flex items-center border-b border-zinc-600 py-4">
-    <img src={thumbnail} alt=`アイコン画像(${name})` class="rounded-full size-24">
-    <div class="flex flex-col mx-5 w-96">
-        <h1 class="text-4xl">{name}</h1>
-        <p class=`mt-5 text-lg text-zinc-700 dark:text-zinc-400 ${pclassName}`>{description}</p>
+<!-- 画面が広い(1150px以上)とき -->
+<div class="max-[1150px]:hidden">
+    <div class="flex items-center border-b border-zinc-600 py-4">
+        <img src={thumbnail} alt=`アイコン画像(${name})` class="rounded-full size-24">
+        <div class="flex flex-col mx-5 w-96">
+            <h1 class="text-4xl">{name}</h1>
+            <p class=`mt-5 text-lg text-zinc-700 dark:text-zinc-400 ${pclassName}`>{description}</p>
+        </div>
+        <slot />
     </div>
-    <slot />
+</div>
+
+<!-- 画面が狭い(1150px未満)とき -->
+<div class="min-[1150px]:hidden">
+    <div class="flex items-center border-b border-zinc-600 py-4">
+        <img src={thumbnail} alt=`アイコン画像(${name})` class="rounded-full size-24">
+        <div class="flex flex-col">
+            <div class="flex flex-col mx-5">
+                <h1 class="text-4xl">{name}</h1>
+                <p class=`text-lg text-zinc-700 dark:text-zinc-400 ${pclassName}`>{description}</p>
+            </div>
+            <div class="flex flex-wrap p-6"><slot /></div>
+        </div>
+    </div>
 </div>
